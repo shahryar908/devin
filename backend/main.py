@@ -7,7 +7,17 @@ from routes.rooms.rooms import router as rooms_router
 from ws.server import sio  # noqa: F401  (registers socket.io handlers)
 from ws.room_manager import manager
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="Math Duel Backend")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth_router)
 app.include_router(rooms_router)

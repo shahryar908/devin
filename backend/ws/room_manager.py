@@ -233,24 +233,30 @@ class RoomManager:
             winner = remaining[0]
             room.ended_at = utcnow()
             ended = room.ended_at
+            started = room.started_at or ended
+            scoreboard = [p.public() for p in room.players.values()] + [leaver.public()]
             await self.sio.emit(
                 "match:end",
                 {
                     "winner": winner.user_id,
-                    "scoreboard": [p.public() for p in room.players.values()],
+                    "scoreboard": scoreboard,
                     "expiry": ended.isoformat(),
                 },
                 room=room.code,
             )
+            players_data = [
+                {"user_id": p.user_id, "correct": p.correct, "total": p.total}
+                for p in list(room.players.values()) + [leaver]
+            ]
             await asyncio.to_thread(
                 save_match,
                 room.code,
                 room.mode,
                 room.duration,
                 winner.user_id,
-                room.started_at,
+                started,
                 ended,
-                [{"user_id": p.user_id, "correct": p.correct, "total": p.total} for p in room.players.values()],
+                players_data,
             )
         await self._schedule_cleanup(room)
 
