@@ -1,6 +1,6 @@
-def main():
-    print("Hello from harness!")
 
+
+from brain_harness.demo import main
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

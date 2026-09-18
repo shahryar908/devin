@@ -18,12 +18,12 @@ async def compact_messages(
 ) -> list[dict]:
     summary = await summarize(messages, model)
     system = messages[0]
-    prompt = next(
-        (m for m in messages[1:] if m.get("role") == "user"),
+    last_user = next(
+        (m for m in reversed(messages[1:]) if m.get("role") == "user"),
         {"role": "user", "content": ""},
     )
     return [
         system,
         {"role": "user", "content": wrap_untrusted("conversation-summary", summary)},
-        prompt,
+        last_user,
     ]

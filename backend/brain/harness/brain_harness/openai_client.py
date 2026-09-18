@@ -10,7 +10,7 @@ from openai import AsyncOpenAI
 from brain_harness.tools.definitions import OPENAI_TOOLS
 
 DEFAULT_MODEL = "gpt-4o"
-SUMMARIZER_MODEL_SUFFIX = "-turbo"
+DEFAULT_SUMMARIZER_MODEL = "gpt-4o-mini"
 
 
 def resolve_openai_model(override: Optional[str]) -> str:
@@ -20,8 +20,9 @@ def resolve_openai_model(override: Optional[str]) -> str:
 
 
 def resolve_summarizer_model(model: str) -> str:
-    base = model.split("-")[0]
-    return f"{base}{SUMMARIZER_MODEL_SUFFIX}"
+    if model and any(marker in model.lower() for marker in ("mini", "-flash", "-small", "3.5-turbo")):
+        return model
+    return DEFAULT_SUMMARIZER_MODEL
 
 
 def create_openai_client(api_key: Optional[str] = None) -> AsyncOpenAI:
